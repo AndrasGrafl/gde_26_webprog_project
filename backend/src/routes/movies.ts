@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/:id/screenings', async (req: Request, res: Response): Promise<void> => {
   try {
-    const movieId = parseInt(req.params.id);
+    const movieId = parseInt(req.params.id as string);
     if (isNaN(movieId)) {
       res.status(400).json({ error: 'Invalid movie ID' });
       return;
@@ -49,7 +49,7 @@ router.post('/', authenticateToken, requireAdmin, async (req: Request, res: Resp
     res.status(201).json(newMovie[0]);
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
+      res.status(400).json({ error: 'Validation failed', details: error.issues });
     } else {
       res.status(500).json({ error: 'Failed to create movie' });
     }

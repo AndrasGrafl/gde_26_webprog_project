@@ -42,7 +42,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ message: 'User registered successfully', user: newUser[0] });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
+      res.status(400).json({ error: 'Validation failed', details: error.issues });
     } else {
       res.status(500).json({ error: 'An internal server error occurred' });
     }
@@ -76,7 +76,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
+      res.status(400).json({ error: 'Validation failed', details: error.issues });
     } else {
       res.status(500).json({ error: 'An internal server error occurred' });
     }

@@ -57,7 +57,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response): Pro
     res.status(201).json({ message: 'Booking successful', booking: newBooking[0] });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
+      res.status(400).json({ error: 'Validation failed', details: error.issues });
     } else {
       res.status(500).json({ error: 'Failed to create booking' });
     }
