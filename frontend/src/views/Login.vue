@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 
-const router = useRouter();
 const toast = useToast();
 
 const email = ref('');

@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { db } from '../db';
-import { bookings, screenings } from '../db/schema';
+import { bookings, screenings, movies } from '../db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { z } from 'zod';
@@ -16,9 +16,20 @@ router.get('/my-bookings', authenticateToken, async (req: AuthRequest, res: Resp
   try {
     const userId = req.user!.id;
     
-    const myBookings = await db.select()
+    const myBookings = await db.select({
+      bookingId: bookings.id,
+      seatsBooked: bookings.seatsBooked,
+      createdAt: bookings.createdAt,
+      room: screenings.room,
+      startTime: screenings.startTime,
+      movieTitle: movies.title,
+      posterUrl: movies.posterUrl
+    })
       .from(bookings)
-      .where(eq(bookings.userId, userId));
+      .innerJoin(screenings, eq(bookings.screeningId, screenings.id))
+      .innerJoin(movies, eq(screenings.movieId, movies.id))
+      .where(eq(bookings.userId, userId))
+      .orderBy(bookings.createdAt);
       
     res.json(myBookings);
   } catch (error) {

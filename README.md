@@ -1,85 +1,310 @@
-# Mozi Jegyfoglaló Rendszer (Webprogramozás Projekt)
+# Mozi Jegyfoglalo Rendszer
 
-Ez a projekt egy webalkalmazás mozik számára, ahol a felhasználók regisztrálhatnak, bejelentkezhetnek, böngészhetnek a filmek és aktuális vetítések között, valamint jegyeket foglalhatnak.
-A projekt két fő részből áll: egy Node.js/Express alapú **Backend** (API) szolgáltatásból, és egy Vue.js + Vite alapú **Frontend** kliensből.
+Ez a projekt egy online jegyfoglalo webalkalmazas mozik szamara. A felhasznalok filmeket es vetiteseket bongeszhetnek, regisztralhatnak, bejelentkezhetnek, majd jegyet foglalhatnak a kivalasztott idopontra. Bejelentkezes utan a sajat foglalasaik is megtekinthetok.
 
-## Fő funkciók
-- Felhasználói regisztráció és bejelentkezés JWT alapú hitelesítéssel.
-- Filmek listázása és vetítések megtekintése.
-- Dinamikus jegyfoglalás, elérhető helyek ellenőrzésével.
-- Reszponzív felület Tailwind CSS segítségével.
+## Alkalmazas felepitese
 
-## Technológiák
-- **Backend:** Node.js, Express.js, TypeScript, PostgreSQL, Drizzle ORM, Zod, JsonWebToken.
-- **Frontend:** Vue 3 (Composition API), Vue Router, Vite, Tailwind CSS.
-- **Infrastruktúra:** Docker (PostgreSQL futtatására).
+- `backend/`: Node.js, Express es TypeScript alapu REST API.
+- `frontend/`: Vue 3, Vite es Tailwind CSS alapu kliensalkalmazas.
+- `backend/src/db/schema.ts`: Drizzle ORM adatbazis modellek.
+- `backend/drizzle/0000_tough_revanche.sql`: az adatbazis letrehozasahoz szukseges SQL script.
+- `docker-compose.yml`: PostgreSQL, backend es frontend konteneres futtatasa.
 
-## Környezeti Változók (Environment Variables)
+## Fobb funkciok
 
-A backend elindításához szükséges egy `.env` fájl a `backend/` mappában. Ez tartalmazza az érzékeny beállításokat. Példa a `backend/.env` fájl tartalmára:
+- Filmek listazasa.
+- Vetitesek listazasa filmenkent.
+- Felhasznaloi regisztracio es bejelentkezes JWT hitelesitessel.
+- Jegyfoglalas elerheto helyek ellenorzesevel.
+- Sajat foglalasok nyomon kovetese.
+- Reszponziv kliensoldal Tailwind CSS segitsegevel.
+
+## Technologiak
+
+- Backend: Node.js, Express, TypeScript, PostgreSQL, Drizzle ORM, Zod, JWT, bcrypt.
+- Frontend: Vue 3, Vue Router, Vite, Tailwind CSS.
+- Teszteles: Jest es Supertest.
+- Kontenerizacio: Docker es Docker Compose.
+
+## Konfiguracio
+
+A backend az alabbi kornyezeti valtozokat hasznalja:
 
 ```env
-# A backend szerver portja
 PORT=3000
-
-# PostgreSQL adatbázis kapcsolati sztring
 DATABASE_URL=postgresql://admin:adminpassword@localhost:5432/mozi_db
-
-# JWT Titkos kulcs a tokenek aláírásához (fejlesztési környezetben bármi lehet)
 JWT_SECRET=super_secret_key_for_jwt_development
 ```
 
-## Projekt Telepítése és Futtatása (Setup Instructions)
+Docker Compose futtatasnal ezek automatikusan be vannak allitva a `docker-compose.yml` fajlban. Helyi, Docker nelkuli backend futtatashoz hozz letre egy `backend/.env` fajlt a fenti tartalommal.
 
-### 1. Előfeltételek
-- Node.js (v18+)
-- Docker és Docker Compose
-- Git
+## Futtatas Dockerrel
 
-### 2. Adatbázis elindítása
-A projekt PostgreSQL adatbázist használ, amelyhez legegyszerűbben Docker használatával férhetünk hozzá.
-A projekt gyökerében add ki a következő parancsot:
+Az alkalmazas teljes fejlesztoi kornyezete indithato Docker Compose-zal:
+
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
-Ez elindítja a `mozi_db` elnevezésű adatbázist a háttérben.
 
-### 3. Backend (API) telepítése és elindítása
-Nyiss egy új terminál ablakot, majd:
+Ez elinditja:
+
+- PostgreSQL adatbazist: `localhost:5432`
+- Backend API-t: `http://localhost:3000`
+- Frontend alkalmazast: `http://localhost:5173`
+
+Az elso inditas utan az adatbazis tablak letrehozasahoz futtasd:
+
 ```bash
-# Lépj be a backend mappába
+docker-compose exec backend npx drizzle-kit push
+```
+
+Opcionális tesztadatok betoltese:
+
+```bash
+docker-compose exec backend npx ts-node src/db/seed.ts
+```
+
+## Helyi futtatas Docker nelkul
+
+Adatbazis inditasa:
+
+```bash
+docker-compose up -d db
+```
+
+Backend:
+
+```bash
 cd backend
-
-# Telepítsd a függőségeket
 npm install
-
-# Futtasd le az adatbázis migrációkat (táblák létrehozása)
 npx drizzle-kit push
-
-# (Opcionális) Töltsd fel teszt adatokkal az adatbázist (Filmek és vetítések)
 npx ts-node src/db/seed.ts
-
-# Indítsd el a backend szervert
 npm run dev
 ```
-A backend a `http://localhost:3000` címen fog futni.
 
-### 4. Frontend kliens telepítése és elindítása
-Nyiss egy másik terminál ablakot:
+Frontend:
+
 ```bash
-# Lépj be a frontend mappába
 cd frontend
-
-# Telepítsd a függőségeket
 npm install
-
-# Indítsd el a fejlesztői szervert
 npm run dev
 ```
-A frontend applikáció egy automatikusan kapott porton indul el (pl. `http://localhost:5173`). Kattints a megjelenő hivatkozásra a böngészőből való eléréshez!
 
-## Tesztelés
-A backendhez írt API tesztek (`jest` + `supertest`) futtatásához lépj be a `backend/` mappába, majd:
+## API vegpontok
+
+### Auth
+
+`POST /auth/register`
+
+Uj felhasznalo regisztralasa.
+
+Request body:
+
+```json
+{
+  "name": "Teszt Elek",
+  "email": "teszt@example.com",
+  "password": "titkos123"
+}
+```
+
+Sikeres valasz: `201 Created`
+
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": 1,
+    "name": "Teszt Elek",
+    "email": "teszt@example.com",
+    "role": "user"
+  }
+}
+```
+
+`POST /auth/login`
+
+Bejelentkezes JWT token igenylesehez.
+
+Request body:
+
+```json
+{
+  "email": "teszt@example.com",
+  "password": "titkos123"
+}
+```
+
+Sikeres valasz: `200 OK`
+
+```json
+{
+  "message": "Login successful",
+  "token": "jwt-token",
+  "user": {
+    "id": 1,
+    "name": "Teszt Elek",
+    "email": "teszt@example.com",
+    "role": "user"
+  }
+}
+```
+
+### Filmek es vetitesek
+
+`GET /movies`
+
+Az osszes film listazasa.
+
+Sikeres valasz: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Film cime",
+    "description": "Leiras",
+    "genre": "Sci-fi",
+    "durationMinutes": 120,
+    "posterUrl": "https://example.com/poster.jpg"
+  }
+]
+```
+
+`GET /movies/:id/screenings`
+
+Egy filmhez tartozo vetitesek listazasa. Az `:id` a film azonositoja.
+
+Sikeres valasz: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "movieId": 1,
+    "room": "1. terem",
+    "startTime": "2026-05-20T18:00:00.000Z",
+    "availableSeats": 80
+  }
+]
+```
+
+`POST /movies`
+
+Admin jogosultsaghoz kotott film letrehozasa.
+
+Header:
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+Request body:
+
+```json
+{
+  "title": "Uj film",
+  "description": "Film leirasa",
+  "genre": "Drama",
+  "durationMinutes": 100,
+  "posterUrl": "https://example.com/poster.jpg"
+}
+```
+
+### Foglalasok
+
+`POST /bookings`
+
+Jegyfoglalas letrehozasa. Bejelentkezes szukseges.
+
+Header:
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+Request body:
+
+```json
+{
+  "screeningId": 1,
+  "seatsBooked": 2
+}
+```
+
+Sikeres valasz: `201 Created`
+
+```json
+{
+  "message": "Booking successful",
+  "booking": {
+    "id": 1,
+    "userId": 1,
+    "screeningId": 1,
+    "seatsBooked": 2
+  }
+}
+```
+
+`GET /bookings/my-bookings`
+
+A bejelentkezett felhasznalo sajat foglalasainak listazasa.
+
+Header:
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+Sikeres valasz: `200 OK`
+
+```json
+[
+  {
+    "bookingId": 1,
+    "seatsBooked": 2,
+    "createdAt": "2026-05-15T20:00:00.000Z",
+    "room": "1. terem",
+    "startTime": "2026-05-20T18:00:00.000Z",
+    "movieTitle": "Film cime",
+    "posterUrl": "https://example.com/poster.jpg"
+  }
+]
+```
+
+## Teszteles es build
+
+Backend tesztek:
+
 ```bash
+cd backend
 npm test
 ```
+
+Backend build:
+
+```bash
+cd backend
+npm run build
+```
+
+Frontend build:
+
+```bash
+cd frontend
+npm run build
+```
+
+## Beadando kovetelmenyek
+
+- Forraskod: `backend/`, `frontend/`
+- Git repository: `.git`
+- SQL script: `backend/drizzle/0000_tough_revanche.sql`
+- Dokumentacio: `README.md`
+- Docker konfiguracio: `backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.yml`
+
+## Megvalositott kiegeszito funkciok
+
+- Autentikacio JWT-vel.
+- ORM rendszer: Drizzle ORM.
+- Kontenerizacio Dockerrel es Docker Compose-zal.

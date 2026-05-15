@@ -30,6 +30,7 @@ const logout = () => {
               <router-link to="/register" class="bg-indigo-500 hover:bg-indigo-400 px-3 py-2 rounded-md text-sm font-medium">Regisztráció</router-link>
             </template>
             <template v-else>
+              <router-link to="/my-bookings" class="hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Foglalásaim</router-link>
               <button @click="logout" class="hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium">Kijelentkezés</button>
             </template>
           </div>
