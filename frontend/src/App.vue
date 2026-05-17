@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const isLoggedIn = computed(() => {
-  return !!localStorage.getItem("token");
-});
+const isLoggedIn = ref(!!localStorage.getItem("token"));
 
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  isLoggedIn.value = false;
   router.push("/login");
 };
 </script>
