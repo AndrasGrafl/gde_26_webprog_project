@@ -36,7 +36,16 @@ DATABASE_URL=postgresql://admin:adminpassword@localhost:5432/mozi_db
 JWT_SECRET=super_secret_key_for_jwt_development
 ```
 
-Docker Compose futtatasnal ezek automatikusan be vannak allitva a `docker-compose.yml` fajlban. Helyi, Docker nelkuli backend futtatashoz hozz letre egy `backend/.env` fajlt a fenti tartalommal.
+Docker Compose futtatasnal a projekt gyokerben hozz letre egy `.env` fajlt az alabbi tartalommal:
+
+```env
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=adminpassword
+POSTGRES_DB=mozi_db
+JWT_SECRET=super_secret_key_for_jwt_development
+```
+
+Ilyenkor a `DATABASE_URL` a Compose fajlban ezekbol az ertekekbol epul fel. Helyi, Docker nelkuli backend futtatashoz hozz letre egy `backend/.env` fajlt a fenti tartalommal.
 
 ## Futtatas Dockerrel
 

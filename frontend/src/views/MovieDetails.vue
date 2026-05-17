@@ -19,7 +19,6 @@ const isBooking = ref(false);
 
 onMounted(async () => {
   try {
-    // Film adatainak lekérése (egyelőre lekérjük az összeset, és megkeressük, a backend egyszerűsítése miatt)
     const moviesRes = await fetch('http://localhost:3000/movies');
     if (moviesRes.ok) {
       const allMovies = await moviesRes.json();
@@ -32,7 +31,6 @@ onMounted(async () => {
       return;
     }
 
-    // Vetítések lekérése
     const screenRes = await fetch(`http://localhost:3000/movies/${movieId}/screenings`);
     if (screenRes.ok) {
       screenings.value = await screenRes.json();
@@ -81,7 +79,6 @@ const handleBook = async () => {
 
     toast.success('Sikeres jegyfoglalás!');
     
-    // Frissítjük a konkrét vetítés szabad helyeit a helyi state-ben
     const sc = screenings.value.find(s => s.id === selectedScreening.value);
     if(sc) sc.availableSeats -= ticketCount.value;
 

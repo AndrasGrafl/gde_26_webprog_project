@@ -28,7 +28,6 @@ const handleLogin = async () => {
     localStorage.setItem('user', JSON.stringify(data.user));
     toast.success('Sikeres bejelentkezés!');
     
-    // Frissítjük az oldalt, hogy az App.vue computed propertyje érzékelje
     window.location.href = '/'; 
   } catch (error) {
     toast.error('Hiba történt a szerverrel való kommunikáció során.');
